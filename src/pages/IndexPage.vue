@@ -9,16 +9,44 @@
           :error="form.email.error"
           :error-message="form.email.msg"
         >
+          <template v-slot:append>
+            <q-icon name="email"></q-icon>
+          </template>
         </q-input>
+
+        <q-input
+          v-model="form.password.value"
+          :error="form.password.error"
+          :error-message="form.password.msg"
+        >
+          <template v-slot:append>
+            <q-icon name="password"></q-icon>
+          </template>
+        </q-input>
+
+        <div class="column">
+          <q-btn color="indigo" @click="submitLogin">Login</q-btn>
+        </div>
       </div>
     </div>
   </q-page>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
+<script setup>
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'IndexPage',
+const form = ref({
+  email: {
+    value: '',
+    email: true,
+    required: true,
+  },
+
+  password: {
+    value: '',
+    required: true,
+  },
 })
+
+const submitLogin = () => {}
 </script>
