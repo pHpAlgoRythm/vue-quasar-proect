@@ -7,9 +7,9 @@
         <q-input
           outlined
           label="Please Enter Email"
-          v-model="form.email"
-          :error="!!errors.email"
-          :error-message="errors.email"
+          v-model="form.email.value"
+          :error="form.email.error"
+          :error-message="form.email.msg"
         >
           <template v-slot:prepend>
             <q-icon name="email"></q-icon>
@@ -20,10 +20,10 @@
           class="q-mt-sm"
           outlined
           label="Please Enter Password"
-          v-model="form.password"
+          v-model="form.password.value"
           :type="showPassword ? 'text' : 'password'"
-          :error="!!errors.password"
-          :error-message="errors.password"
+          :error="form.password.error"
+          :error-message="form.password.msg"
         >
           <template v-slot:prepend>
             <q-icon name="lock"></q-icon>
@@ -50,15 +50,22 @@
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
-import auth from '@/api/auth' // Import auth.js
+import auth from '../api/auth'
 
 const $q = useQuasar()
 const router = useRouter()
 const loading = ref(false)
 
 const form = ref({
-  email: '',
-  password: '',
+  email: {
+    value: '',
+    email: true,
+    required: true,
+  },
+  password: {
+    value: '',
+    required: true,
+  },
 })
 
 const submitLogin = async () => {
