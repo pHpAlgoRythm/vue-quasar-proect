@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row width-full h-screen flex justify-center item-center">
+  <q-page class="row width-full h-screen flex justify-center items-center">
     <div class="col-12 col-md-4 col-lg-4 pa-md">
       <div class="text-h4 text-bold">Laptop Zone</div>
       <div class="text-grey-7">Please Login Your Account Below</div>
@@ -7,9 +7,9 @@
         <q-input
           outlined
           label="Please Enter Email"
-          v-model="form.email.value"
-          :error="form.email.error"
-          :error-message="form.email.msg"
+          v-model="form.email"
+          :error="!!errors.email"
+          :error-message="errors.email"
         >
           <template v-slot:prepend>
             <q-icon name="email"></q-icon>
@@ -20,21 +20,26 @@
           class="q-mt-sm"
           outlined
           label="Please Enter Password"
-          v-model="form.password.value"
-          :error="form.password.error"
-          :error-message="form.password.msg"
+          v-model="form.password"
+          :type="showPassword ? 'text' : 'password'"
+          :error="!!errors.password"
+          :error-message="errors.password"
         >
           <template v-slot:prepend>
             <q-icon name="lock"></q-icon>
           </template>
 
           <template v-slot:append>
-            <q-icon name="visibility_off"></q-icon>
+            <q-icon
+              :name="showPassword ? 'visibility' : 'visibility_off'"
+              @click="showPassword = !showPassword"
+              class="cursor-pointer"
+            ></q-icon>
           </template>
         </q-input>
 
         <div class="column q-mt-sm">
-          <q-btn color="indigo" @click="submitLogin">Login</q-btn>
+          <q-btn color="indigo" @click="submitLogin" :loading="loading">Login</q-btn>
         </div>
       </div>
     </div>
@@ -45,36 +50,34 @@
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
+import auth from '@/api/auth' // Import auth.js
 
 const $q = useQuasar()
 const router = useRouter()
+const loading = ref(false)
 
 const form = ref({
-  email: {
-    value: '',
-    email: true,
-    required: true,
-  },
-
-  password: {
-    value: '',
-    required: true,
-  },
+  email: '',
+  password: '',
 })
 
-const submitLogin = () => {
+const submitLogin = async () => {
   if (!form.value.email || !form.value.password) {
-    $q.notify({ type: 'negative', message: 'please fill in all fields' })
+    $q.notify({ type: 'negative', message: 'Please fill in all fields' })
     return
   }
 
-  setTimeout(() => {
-    if (form.value.email.value === 'shem@example.com' && form.value.password.value === '123') {
-      $q.notify({ type: 'positive', message: 'Login Successfully' })
-      router.push('/admin')
-    } else {
-      $q.notify({ type: 'negative', message: 'Invalid Credentials' })
-    }
-  }, 1000)
+  loading.value = true
+
+  const result = await auth.login(form.value)
+
+  if (result.success) {
+    $q.notify({ type: 'positive', message: 'Login Successful' })
+    router.push('/admin') // Redirect to dashboard
+  } else {
+    $q.notify({ type: 'negative', message: result.message })
+  }
+
+  loading.value = false
 }
 </script>
